@@ -1,4 +1,5 @@
-const CACHE_NAME = 'marginalia-static-v3';
+const CACHE_NAME = 'marginalia-static-v4';
+
 const STATIC_ASSETS = [
   './',
   './index.html',
@@ -21,7 +22,11 @@ self.addEventListener('activate', (event) => {
     caches.keys()
       .then((cacheNames) => Promise.all(
         cacheNames
-          .filter((cacheName) => cacheName.startsWith('marginalia-static-') && cacheName !== CACHE_NAME)
+          .filter(
+            (cacheName) =>
+              cacheName.startsWith('marginalia-static-') &&
+              cacheName !== CACHE_NAME
+          )
           .map((cacheName) => caches.delete(cacheName)),
       ))
       .then(() => self.clients.claim()),
@@ -31,23 +36,36 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const requestUrl = new URL(event.request.url);
 
-  if (event.request.method !== 'GET' || requestUrl.origin !== self.location.origin) return;
+  if (
+    event.request.method !== 'GET' ||
+    requestUrl.origin !== self.location.origin
+  ) {
+    return;
+  }
 
   const isNavigation = event.request.mode === 'navigate';
-  const isStaticAsset = STATIC_ASSETS.some((assetPath) => new URL(assetPath, self.location.origin).pathname === requestUrl.pathname);
+
+  const isStaticAsset = STATIC_ASSETS.some(
+    (assetPath) =>
+      new URL(assetPath, self.location.origin).pathname === requestUrl.pathname
+  );
 
   if (!isNavigation && !isStaticAsset) return;
 
   event.respondWith(
-    caches.match(event.request)
-      .then((cachedResponse) => cachedResponse || fetch(event.request)
-        .then((networkResponse) => {
-          if (networkResponse.ok) {
-            const responseToCache = networkResponse.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseToCache));
-          }
-          return networkResponse;
-        }))
-      .catch(() => caches.match('./index.html')),
+    fetch(event.request)
+      .then((networkResponse) => {
+        if (networkResponse.ok) {
+          const responseToCache = networkResponse.clone();
+
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(event.request, responseToCache);
+          });
+        }
+
+        return networkResponse;
+      })
+      .catch(() => caches.match(event.request))
+      .then((response) => response || caches.match('./index.html'))
   );
 });
