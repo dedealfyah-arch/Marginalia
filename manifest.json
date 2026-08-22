@@ -1,0 +1,24 @@
+{
+  "name": "Marginalia",
+  "short_name": "Marginalia",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#faf9f5",
+  "theme_color": "#5b7b65",
+  "description": "Personal reading and knowledge app.",
+  "icons": [
+    {
+      "src": "icons/marginalia.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/marginalia.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

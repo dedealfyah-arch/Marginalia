@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#5b7b65" />
+  <link rel="manifest" href="manifest.json" />
+  <title>Marginalia</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <div class="app">
+
+    <p id="persistence-error" class="persistence-error" role="alert" aria-live="assertive" hidden></p>
+
+    <!-- ================= SIDEBAR ================= -->
+    <aside class="sidebar">
+      <div class="sidebar__logo">
+        <span class="sidebar__logo-mark" aria-hidden="true">📖</span>
+        <span class="sidebar__logo-text">Marginalia</span>
+      </div>
+
+      <nav class="sidebar__nav" aria-label="Navigasi utama">
+        <a href="#" class="sidebar__link sidebar__link--active" data-view="home" aria-current="page">
+          <span class="sidebar__icon" aria-hidden="true">🏠</span>
+          <span class="sidebar__label">Home</span>
+        </a>
+        <a href="#" class="sidebar__link" data-view="books">
+          <span class="sidebar__icon" aria-hidden="true">📚</span>
+          <span class="sidebar__label">Books</span>
+        </a>
+        <a href="#" class="sidebar__link" data-view="vocabulary">
+          <span class="sidebar__icon" aria-hidden="true">🔤</span>
+          <span class="sidebar__label">Vocabulary</span>
+        </a>
+        <a href="#" class="sidebar__link" data-view="quotes">
+          <span class="sidebar__icon" aria-hidden="true">💬</span>
+          <span class="sidebar__label">Quotes</span>
+        </a>
+      </nav>
+
+      <div class="sidebar__footer">
+        <div class="sync-panel" aria-live="polite">
+          <span id="sync-indicator" class="sync-indicator">⚠ Offline</span>
+          <form id="auth-form" class="auth-form" novalidate>
+            <label class="visually-hidden" for="auth-email-input">Email</label>
+            <input id="auth-email-input" type="email" placeholder="Email" autocomplete="email" />
+            <label class="visually-hidden" for="auth-password-input">Password</label>
+            <input id="auth-password-input" type="password" placeholder="Password" autocomplete="current-password" />
+            <button type="submit" id="auth-submit-btn" class="btn btn--primary">Login</button>
+            <button type="button" id="auth-logout-btn" class="btn btn--ghost" hidden>Logout</button>
+            <p id="auth-status" class="auth-status" hidden></p>
+          </form>
+        </div>
+        <a href="#" class="sidebar__link">
+          <span class="sidebar__icon" aria-hidden="true">⚙️</span>
+          <span class="sidebar__label">Settings</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- ================= MAIN CONTENT ================= -->
+    <main class="main">
+
+      <!-- =========================================================
+           VIEW: HOME
+           ========================================================= -->
+      <div class="view" id="view-home">
+
+        <!-- Search -->
+        <section class="search" aria-label="Pencarian">
+          <label for="search-input" class="visually-hidden">Cari koleksi Anda</label>
+          <span class="search__icon" aria-hidden="true">🔍</span>
+          <input
+            id="search-input"
+            type="text"
+            class="search__input"
+            placeholder="Search your knowledge..."
+            autocomplete="off"
+          />
+        </section>
+
+        <section class="global-search-results" aria-live="polite" aria-label="Hasil Global Search">
+          <p id="global-search-empty" class="empty-message">Start typing to search your knowledge.</p>
+          <p id="global-search-no-results" class="empty-message" hidden>No results found.</p>
+          <div id="global-search-list" class="global-search-list"></div>
+        </section>
+
+        <div class="add-knowledge">
+          <button type="button" id="add-knowledge-btn" class="btn btn--primary">+ Add Knowledge</button>
+        </div>
+
+        <div class="home-primary-grid">
+          <!-- Continue Reading -->
+          <section class="section" aria-labelledby="continue-reading-title">
+            <h2 id="continue-reading-title" class="section__title">Continue Reading</h2>
+
+            <article class="reading-card" id="home-reading-card"></article>
+          </section>
+
+          <!-- Recently Added -->
+          <section class="section" aria-labelledby="recently-added-title">
+            <h2 id="recently-added-title" class="section__title">Recently Added</h2>
+
+            <div class="card-grid" id="recently-added-grid"></div>
+            <p id="recently-added-empty" class="empty-message" hidden>No knowledge added yet.</p>
+            <button type="button" id="recently-added-empty-add-btn" class="btn btn--primary" hidden>Add Knowledge</button>
+          </section>
+        </div>
+
+        <!-- Reading Statistics -->
+        <section class="section" aria-labelledby="stats-title">
+          <h2 id="stats-title" class="section__title">Reading Statistics</h2>
+
+          <div class="stat-grid">
+            <div class="stat-card">
+              <span class="stat-card__number" id="stat-books">0</span>
+              <span class="stat-card__label">Books</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-card__number" id="stat-reading">0</span>
+              <span class="stat-card__label">Currently Reading</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-card__number" id="stat-vocabulary">0</span>
+              <span class="stat-card__label">Vocabulary</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-card__number" id="stat-quotes">0</span>
+              <span class="stat-card__label">Quotes</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-card__number" id="stat-notes">0</span>
+              <span class="stat-card__label">Notes</span>
+            </div>
+          </div>
+        </section>
+
+      </div>
+      <!-- /view-home -->
+
+      <!-- ================= VIEW: VOCABULARY ================= -->
+      <div class="view" id="view-vocabulary" hidden>
+        <header class="header">
+          <div class="header__text">
+            <h1 class="header__title">Vocabulary</h1>
+            <p class="header__subtitle">Words saved across your books.</p>
+          </div>
+        </header>
+
+        <section class="aggregate-toolbar" aria-label="Vocabulary tools">
+          <div class="search aggregate-toolbar__search" aria-label="Pencarian vocabulary">
+            <label for="all-vocabulary-search-input" class="visually-hidden">Cari vocabulary</label>
+            <span class="search__icon" aria-hidden="true">🔍</span>
+            <input id="all-vocabulary-search-input" type="text" class="search__input" placeholder="Search vocabulary..." autocomplete="off" />
+          </div>
+          <button type="button" id="aggregate-add-vocabulary-btn" class="btn btn--primary">+ Add Word</button>
+        </section>
+
+        <section class="section" aria-labelledby="all-vocabulary-title">
+          <h2 id="all-vocabulary-title" class="section__title">All Vocabulary</h2>
+          <div class="compact-card-grid" id="all-vocabulary-grid"></div>
+          <p id="all-vocabulary-empty" class="empty-message" hidden>No vocabulary found.</p>
+        </section>
+      </div>
+
+      <!-- ================= VIEW: QUOTES ================= -->
+      <div class="view" id="view-quotes" hidden>
+        <header class="header">
+          <div class="header__text">
+            <h1 class="header__title">Quotes</h1>
+            <p class="header__subtitle">Lines worth returning to.</p>
+          </div>
+        </header>
+
+        <section class="aggregate-toolbar" aria-label="Quote tools">
+          <div class="search aggregate-toolbar__search" aria-label="Pencarian quotes">
+            <label for="all-quotes-search-input" class="visually-hidden">Cari quotes</label>
+            <span class="search__icon" aria-hidden="true">🔍</span>
+            <input id="all-quotes-search-input" type="text" class="search__input" placeholder="Search quotes..." autocomplete="off" />
+          </div>
+          <button type="button" id="aggregate-add-quote-btn" class="btn btn--primary">+ Add Quote</button>
+        </section>
+
+        <section class="section" aria-labelledby="all-quotes-title">
+          <h2 id="all-quotes-title" class="section__title">All Quotes</h2>
+          <div class="compact-card-grid" id="all-quotes-grid"></div>
+          <p id="all-quotes-empty" class="empty-message" hidden>No quotes found.</p>
+        </section>
+      </div>
+
+
+      <!-- =========================================================
+           VIEW: BOOKS
+           ========================================================= -->
+      <div class="view" id="view-books" hidden>
+
+        <!-- Header -->
+        <header class="header">
+          <div class="header__text">
+            <h1 class="header__title">Books</h1>
+            <p class="header__subtitle">Your personal reading library.</p>
+          </div>
+          <button type="button" class="header__profile" aria-label="Buka Settings dan profil">
+            <span aria-hidden="true">⚙️</span>
+          </button>
+        </header>
+
+        <!-- Toolbar: search + filter + add book -->
+        <section class="books-toolbar">
+          <div class="search books-toolbar__search" aria-label="Pencarian buku">
+            <label for="book-search-input" class="visually-hidden">Cari buku</label>
+            <span class="search__icon" aria-hidden="true">🔍</span>
+            <input
+              id="book-search-input"
+              type="text"
+              class="search__input"
+              placeholder="Search books..."
+              autocomplete="off"
+            />
+          </div>
+
+          <label for="status-filter" class="visually-hidden">Filter berdasarkan status</label>
+          <select id="status-filter" class="filter-select">
+            <option value="All">All</option>
+            <option value="Want to Read">Want to Read</option>
+            <option value="Reading">Reading</option>
+            <option value="Completed">Completed</option>
+          </select>
+
+          <button type="button" id="add-book-btn" class="btn btn--primary">
+            <span aria-hidden="true">+</span> Add Book
+          </button>
+        </section>
+
+        <!-- Book list -->
+        <section class="section" aria-labelledby="books-list-title">
+          <h2 id="books-list-title" class="section__title">Your Books</h2>
+
+          <div class="book-grid" id="book-grid">
+            <!-- Book cards dirender oleh script.js -->
+          </div>
+
+          <p id="no-books-message" class="empty-message" hidden>No books found.</p>
+        </section>
+
+      </div>
+      <!-- /view-books -->
+
+
+      <!-- =========================================================
+           VIEW: BOOK DETAIL
+           ========================================================= -->
+      <div class="view" id="view-book-detail" hidden>
+
+        <button type="button" id="back-to-books-btn" class="btn btn--ghost back-btn">
+          ← Back to Books
+        </button>
+
+        <!-- Book header -->
+        <article class="reading-card book-detail-header">
+          <div class="reading-card__cover" id="detail-cover" aria-hidden="true">📘</div>
+
+          <div class="reading-card__body">
+            <h1 class="reading-card__title" id="detail-title">Book Title</h1>
+            <p class="reading-card__author" id="detail-author">Author</p>
+
+            <span class="book-card__badge" id="detail-badge">Status</span>
+
+            <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Progres membaca buku ini">
+              <div class="progress__bar" id="detail-progress-bar"></div>
+            </div>
+
+            <div class="reading-card__meta">
+              <span id="detail-progress-label">Page 0 of 0</span>
+              <span id="detail-progress-percent">0%</span>
+            </div>
+
+            <button type="button" id="continue-reading-detail-btn" class="btn btn--primary">Continue Reading</button>
+            <div class="reading-card__actions">
+              <button type="button" id="edit-book-detail-btn" class="btn btn--ghost">Edit Book</button>
+              <button type="button" id="delete-book-detail-btn" class="btn btn--danger">Delete Book</button>
+            </div>
+          </div>
+        </article>
+
+        <!-- Tabs -->
+        <nav class="detail-tabs" aria-label="Bagian detail buku">
+          <button type="button" class="detail-tab detail-tab--active" data-tab="vocabulary">Vocabulary</button>
+          <button type="button" class="detail-tab" data-tab="quotes">Quotes</button>
+          <button type="button" class="detail-tab" data-tab="notes">Notes</button>
+        </nav>
+
+        <!-- Tab panel: Vocabulary -->
+        <section class="section detail-tab-panel" id="tab-vocabulary">
+          <div class="section-header-row">
+            <h2 class="section__title">Vocabulary</h2>
+            <button type="button" id="add-vocabulary-btn" class="btn btn--primary">+ Add Vocabulary</button>
+          </div>
+
+          <div class="search" aria-label="Pencarian vocabulary">
+            <label for="vocab-search-input" class="visually-hidden">Cari vocabulary</label>
+            <span class="search__icon" aria-hidden="true">🔍</span>
+            <input
+              id="vocab-search-input"
+              type="text"
+              class="search__input"
+              placeholder="Search vocabulary..."
+              autocomplete="off"
+            />
+          </div>
+
+          <div class="detail-card-grid" id="vocabulary-grid"></div>
+          <p id="vocabulary-empty" class="empty-message" hidden>No vocabulary yet.</p>
+        </section>
+
+        <!-- Tab panel: Quotes -->
+        <section class="section detail-tab-panel" id="tab-quotes" hidden>
+          <div class="section-header-row">
+            <h2 class="section__title">Quotes</h2>
+            <button type="button" id="add-quote-btn" class="btn btn--primary">+ Add Quote</button>
+          </div>
+
+          <p id="quotes-count" class="detail-list-count">0 quotes</p>
+
+          <div class="search" aria-label="Pencarian quotes">
+            <label for="quote-search-input" class="visually-hidden">Cari quotes</label>
+            <span class="search__icon" aria-hidden="true">🔍</span>
+            <input
+              id="quote-search-input"
+              type="text"
+              class="search__input"
+              placeholder="Search quotes..."
+              autocomplete="off"
+            />
+          </div>
+
+          <div class="detail-card-grid" id="quotes-grid"></div>
+          <p id="quotes-empty" class="empty-message" hidden>No quotes yet.</p>
+        </section>
+
+        <!-- Tab panel: Notes -->
+        <section class="section detail-tab-panel" id="tab-notes" hidden>
+          <div class="section-header-row">
+            <h2 class="section__title">Notes</h2>
+            <button type="button" id="add-note-btn" class="btn btn--primary">+ Add Note</button>
+          </div>
+
+          <p id="notes-count" class="detail-list-count">0 notes</p>
+
+          <div class="search" aria-label="Pencarian notes">
+            <label for="note-search-input" class="visually-hidden">Cari notes</label>
+            <span class="search__icon" aria-hidden="true">🔍</span>
+            <input
+              id="note-search-input"
+              type="text"
+              class="search__input"
+              placeholder="Search notes..."
+              autocomplete="off"
+            />
+          </div>
+
+          <div class="detail-card-grid" id="notes-grid"></div>
+          <p id="notes-empty" class="empty-message" hidden>No notes yet.</p>
+        </section>
+
+      </div>
+      <!-- /view-book-detail -->
+
+    </main>
+  </div>
+
+  <!-- Mobile bottom navigation -->
+  <nav class="bottom-nav" aria-label="Navigasi mobile">
+    <a href="#" class="bottom-nav__link bottom-nav__link--active" data-view="home" aria-current="page">
+      <span aria-hidden="true">🏠</span>
+      <span>Home</span>
+    </a>
+    <a href="#" class="bottom-nav__link" data-view="books">
+      <span aria-hidden="true">📚</span>
+      <span>Books</span>
+    </a>
+    <a href="#" class="bottom-nav__link" data-view="vocabulary">
+      <span aria-hidden="true">🔤</span>
+      <span>Vocab</span>
+    </a>
+    <a href="#" class="bottom-nav__link" data-view="quotes">
+      <span aria-hidden="true">💬</span>
+      <span>Quotes</span>
+    </a>
+  </nav>
+
+  <!-- ================= ADD KNOWLEDGE MODAL (Home) ================= -->
+  <div class="modal-overlay" id="modal-overlay" hidden>
+    <div
+      class="modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-title"
+      id="modal"
+    >
+      <h2 id="modal-title" class="modal__title">Add Knowledge</h2>
+
+      <p id="knowledge-empty-state" class="empty-message" hidden>Add a Book before capturing knowledge.</p>
+
+      <div class="modal__options" id="knowledge-options">
+        <button type="button" class="modal-option" data-type="Book">
+          <span class="modal-option__icon" aria-hidden="true">📚</span>
+          <span class="modal-option__text">
+            <span class="modal-option__title">Book</span>
+            <span class="modal-option__desc">Add a book</span>
+          </span>
+        </button>
+
+        <button type="button" class="modal-option" data-type="Vocabulary">
+          <span class="modal-option__icon" aria-hidden="true">🔤</span>
+          <span class="modal-option__text">
+            <span class="modal-option__title">Vocabulary</span>
+            <span class="modal-option__desc">Save a new word</span>
+          </span>
+        </button>
+
+        <button type="button" class="modal-option" data-type="Quote">
+          <span class="modal-option__icon" aria-hidden="true">💬</span>
+          <span class="modal-option__text">
+            <span class="modal-option__title">Quote</span>
+            <span class="modal-option__desc">Save an important quote</span>
+          </span>
+        </button>
+
+        <button type="button" class="modal-option" data-type="Note">
+          <span class="modal-option__icon" aria-hidden="true">🗒️</span>
+          <span class="modal-option__text">
+            <span class="modal-option__title">Note</span>
+            <span class="modal-option__desc">Write a personal note</span>
+          </span>
+        </button>
+      </div>
+
+      <button type="button" id="knowledge-add-book-btn" class="btn btn--primary" hidden>Add Book</button>
+      <button type="button" id="modal-cancel-btn" class="btn btn--ghost modal__cancel">Cancel</button>
+    </div>
+  </div>
+
+  <!-- ================= ADD BOOK MODAL (Books) ================= -->
+  <div class="modal-overlay" id="book-modal-overlay" hidden>
+    <div
+      class="modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="book-modal-title"
+      id="book-modal"
+    >
+      <h2 id="book-modal-title" class="modal__title">Add Book</h2>
+
+      <form id="add-book-form" novalidate>
+
+        <p id="book-form-error" class="form-error" hidden></p>
+
+        <div class="form-field">
+          <label for="book-title-input">Title</label>
+          <input type="text" id="book-title-input" name="title" autocomplete="off" />
+        </div>
+
+        <div class="form-field">
+          <label for="book-author-input">Author</label>
+          <input type="text" id="book-author-input" name="author" autocomplete="off" />
+        </div>
+
+        <div class="form-field">
+          <label for="book-cover-input">Cover</label>
+          <input type="text" id="book-cover-input" name="cover" maxlength="4" autocomplete="off" />
+        </div>
+
+        <div class="form-field">
+          <label for="book-status-input">Status</label>
+          <select id="book-status-input" name="status">
+            <option value="Want to Read">Want to Read</option>
+            <option value="Reading">Reading</option>
+            <option value="Completed">Completed</option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <div class="form-field">
+            <label for="book-current-page-input">Current Page</label>
+            <input type="number" id="book-current-page-input" name="currentPage" min="0" />
+          </div>
+
+          <div class="form-field">
+            <label for="book-total-pages-input">Total Pages</label>
+            <input type="number" id="book-total-pages-input" name="totalPages" min="1" />
+          </div>
+        </div>
+
+        <div class="modal__actions">
+          <button type="button" id="book-modal-cancel-btn" class="btn btn--ghost">Cancel</button>
+          <button type="submit" id="book-modal-submit-btn" class="btn btn--primary">Add Book</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= UPDATE READING PROGRESS MODAL (Book Detail) ================= -->
+  <div class="modal-overlay" id="progress-modal-overlay" hidden>
+    <div
+      class="modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="progress-modal-title"
+      id="progress-modal"
+    >
+      <h2 id="progress-modal-title" class="modal__title">Update Reading Progress</h2>
+
+      <form id="update-progress-form" novalidate>
+
+        <p id="progress-form-error" class="form-error" hidden></p>
+
+        <div class="form-row">
+          <div class="form-field">
+            <label for="progress-current-page-input">Current Page</label>
+            <input type="number" id="progress-current-page-input" name="currentPage" min="0" />
+          </div>
+
+          <div class="form-field">
+            <label for="progress-total-pages-input">Total Pages</label>
+            <input type="number" id="progress-total-pages-input" name="totalPages" min="1" />
+          </div>
+        </div>
+
+        <div class="modal__actions">
+          <button type="button" id="progress-modal-cancel-btn" class="btn btn--ghost">Cancel</button>
+          <button type="submit" class="btn btn--primary">Save Progress</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= ADD VOCABULARY MODAL (Book Detail) ================= -->
+  <div class="modal-overlay" id="vocab-modal-overlay" hidden>
+    <div
+      class="modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="vocab-modal-title"
+      id="vocab-modal"
+    >
+      <h2 id="vocab-modal-title" class="modal__title">Add Vocabulary</h2>
+
+      <form id="add-vocabulary-form" novalidate>
+
+        <p id="vocab-form-error" class="form-error" hidden></p>
+
+        <div class="form-field">
+          <label for="vocab-word-input">Word</label>
+          <input type="text" id="vocab-word-input" name="word" autocomplete="off" />
+        </div>
+
+        <div class="form-field" id="vocab-book-field" hidden>
+          <label for="vocab-book-input">Book</label>
+          <select id="vocab-book-input" name="book"></select>
+        </div>
+
+        <div class="form-field">
+          <label for="vocab-pronunciation-input">Pronunciation (optional)</label>
+          <input type="text" id="vocab-pronunciation-input" name="pronunciation" autocomplete="off" />
+        </div>
+
+        <div class="form-field">
+          <label for="vocab-pos-input">Part of Speech (optional)</label>
+          <select id="vocab-pos-input" name="partOfSpeech">
+            <option value="">Select...</option>
+            <option value="Noun">Noun</option>
+            <option value="Verb">Verb</option>
+            <option value="Adjective">Adjective</option>
+            <option value="Adverb">Adverb</option>
+            <option value="Pronoun">Pronoun</option>
+            <option value="Preposition">Preposition</option>
+            <option value="Conjunction">Conjunction</option>
+            <option value="Interjection">Interjection</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+
+        <div class="form-field">
+          <label for="vocab-meaning-input">Meaning</label>
+          <textarea id="vocab-meaning-input" name="meaning" rows="2"></textarea>
+        </div>
+
+        <div class="form-row">
+          <div class="form-field">
+            <label for="vocab-synonyms-input">Synonyms (optional)</label>
+            <input type="text" id="vocab-synonyms-input" name="synonyms" autocomplete="off" />
+          </div>
+          <div class="form-field">
+            <label for="vocab-antonyms-input">Antonyms (optional)</label>
+            <input type="text" id="vocab-antonyms-input" name="antonyms" autocomplete="off" />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-field">
+            <label for="vocab-chapter-input">Chapter (optional)</label>
+            <input type="text" id="vocab-chapter-input" name="chapter" autocomplete="off" />
+          </div>
+          <div class="form-field">
+            <label for="vocab-occurrence-date-input">Occurrence Date (optional)</label>
+            <input type="date" id="vocab-occurrence-date-input" name="occurrenceDate" />
+          </div>
+        </div>
+
+        <div class="form-field">
+          <label for="vocab-page-input">Page (optional)</label>
+          <input type="number" id="vocab-page-input" name="page" min="0" />
+        </div>
+
+        <div class="form-field">
+          <label for="vocab-context-input">Context (optional)</label>
+          <textarea id="vocab-context-input" name="context" rows="3"></textarea>
+        </div>
+
+        <div class="form-field">
+          <label for="vocab-personal-note-input">Personal Note (optional)</label>
+          <textarea id="vocab-personal-note-input" name="personalNote" rows="3"></textarea>
+        </div>
+
+        <div class="modal__actions">
+          <button type="button" id="vocab-modal-cancel-btn" class="btn btn--ghost">Cancel</button>
+          <button type="submit" class="btn btn--primary" id="vocab-modal-submit-btn">Save Vocabulary</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= VOCABULARY DETAIL MODAL (Book Detail) ================= -->
+  <div class="modal-overlay" id="vocab-detail-modal-overlay" hidden>
+    <div
+      class="modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="vocab-detail-title"
+      id="vocab-detail-modal"
+    >
+      <h2 id="vocab-detail-title" class="modal__title">Word</h2>
+
+      <div class="detail-view">
+        <p class="detail-view__row">
+          <span class="detail-view__label">Part of Speech</span>
+          <span id="vocab-detail-pos" class="detail-view__value">-</span>
+        </p>
+        <p class="detail-view__row">
+          <span class="detail-view__label">Meaning</span>
+          <span id="vocab-detail-meaning" class="detail-view__value">-</span>
+        </p>
+        <p class="detail-view__row">
+          <span class="detail-view__label">Book</span>
+          <span id="vocab-detail-book" class="detail-view__value">-</span>
+        </p>
+        <p class="detail-view__row">
+          <span class="detail-view__label">Page</span>
+          <span id="vocab-detail-page" class="detail-view__value">-</span>
+        </p>
+        <p class="detail-view__row">
+          <span class="detail-view__label">Context</span>
+          <span id="vocab-detail-context" class="detail-view__value">-</span>
+        </p>
+      </div>
+
+      <div class="modal__actions modal__actions--split">
+        <button type="button" id="vocab-detail-delete-btn" class="btn btn--danger">Delete</button>
+        <div class="modal__actions-right">
+          <button type="button" id="vocab-detail-close-btn" class="btn btn--ghost">← Back</button>
+          <button type="button" id="vocab-detail-edit-btn" class="btn btn--primary">Edit</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= ADD QUOTE MODAL (Book Detail) ================= -->
+  <div class="modal-overlay" id="quote-modal-overlay" hidden>
+    <div
+      class="modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="quote-modal-title"
+      id="quote-modal"
+    >
+      <h2 id="quote-modal-title" class="modal__title">Add Quote</h2>
+
+      <form id="add-quote-form" novalidate>
+
+        <p id="quote-form-error" class="form-error" hidden></p>
+
+        <div class="form-field">
+          <label for="quote-text-input">Quote</label>
+          <textarea id="quote-text-input" name="quote" rows="3"></textarea>
+        </div>
+
+        <div class="form-field" id="quote-book-field" hidden>
+          <label for="quote-book-input">Book</label>
+          <select id="quote-book-input" name="book"></select>
+        </div>
+
+        <div class="form-field">
+          <label for="quote-chapter-input">Chapter (optional)</label>
+          <input type="text" id="quote-chapter-input" name="chapter" autocomplete="off" />
+        </div>
+
+        <div class="form-field">
+          <label for="quote-page-input">Page</label>
+          <input type="number" id="quote-page-input" name="page" min="0" />
+        </div>
+
+        <div class="form-field">
+          <label for="quote-context-input">Context (optional)</label>
+          <textarea id="quote-context-input" name="context" rows="3"></textarea>
+        </div>
+
+        <div class="form-field">
+          <label for="quote-reflection-input">Reflection / Comment (optional)</label>
+          <textarea id="quote-reflection-input" name="reflection" rows="3"></textarea>
+        </div>
+
+        <div class="modal__actions">
+          <button type="button" id="quote-modal-cancel-btn" class="btn btn--ghost">Cancel</button>
+          <button type="submit" class="btn btn--primary" id="quote-modal-submit-btn">Save Quote</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= QUOTE DETAIL MODAL (Book Detail) ================= -->
+  <div class="modal-overlay" id="quote-detail-modal-overlay" hidden>
+    <div
+      class="modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="quote-detail-title"
+      id="quote-detail-modal"
+    >
+      <h2 id="quote-detail-title" class="modal__title">Quote Detail</h2>
+
+      <div class="detail-view">
+        <p class="detail-view__row">
+          <span class="detail-view__label">Book</span>
+          <span id="quote-detail-book" class="detail-view__value">-</span>
+        </p>
+        <p class="detail-view__row">
+          <span class="detail-view__label">Quote</span>
+          <span id="quote-detail-text" class="detail-view__value">-</span>
+        </p>
+        <p class="detail-view__row">
+          <span class="detail-view__label">Page</span>
+          <span id="quote-detail-page" class="detail-view__value">-</span>
+        </p>
+        <p class="detail-view__row">
+          <span class="detail-view__label">Context</span>
+          <span id="quote-detail-context" class="detail-view__value">-</span>
+        </p>
+      </div>
+
+      <div class="modal__actions">
+        <button type="button" id="quote-detail-delete-btn" class="btn btn--danger">Delete</button>
+        <div class="modal__actions-right">
+          <button type="button" id="quote-detail-back-btn" class="btn btn--ghost">← Back</button>
+          <button type="button" id="quote-detail-edit-btn" class="btn btn--primary">Edit</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= NOTE DETAIL MODAL (Global Search / Book Detail) ================= -->
+  <div class="modal-overlay" id="note-detail-modal-overlay" hidden>
+    <div
+      class="modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="note-detail-title"
+      id="note-detail-modal"
+    >
+      <h2 id="note-detail-title" class="modal__title">Note</h2>
+
+      <div class="detail-view">
+        <p class="detail-view__row">
+          <span class="detail-view__label">Book</span>
+          <span id="note-detail-book" class="detail-view__value">-</span>
+        </p>
+        <p class="detail-view__row">
+          <span class="detail-view__label">Content</span>
+          <span id="note-detail-content" class="detail-view__value">-</span>
+        </p>
+        <p class="detail-view__row">
+          <span class="detail-view__label">Page</span>
+          <span id="note-detail-page" class="detail-view__value">-</span>
+        </p>
+      </div>
+
+      <div class="modal__actions">
+        <button type="button" id="note-detail-delete-btn" class="btn btn--danger">Delete</button>
+        <div class="modal__actions-right">
+          <button type="button" id="note-detail-back-btn" class="btn btn--ghost">← Back</button>
+          <button type="button" id="note-detail-edit-btn" class="btn btn--primary">Edit</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= ADD NOTE MODAL (Book Detail) ================= -->
+  <div class="modal-overlay" id="note-modal-overlay" hidden>
+    <div
+      class="modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="note-modal-title"
+      id="note-modal"
+    >
+      <h2 id="note-modal-title" class="modal__title">Add Note</h2>
+
+      <form id="add-note-form" novalidate>
+
+        <p id="note-form-error" class="form-error" hidden></p>
+
+        <div class="form-field">
+          <label for="note-title-input">Title (optional)</label>
+          <input type="text" id="note-title-input" name="title" autocomplete="off" />
+        </div>
+
+        <div class="form-field" id="note-book-field" hidden>
+          <label for="note-book-input">Book</label>
+          <select id="note-book-input" name="book"></select>
+        </div>
+
+        <div class="form-field">
+          <label for="note-text-input">Content</label>
+          <textarea id="note-text-input" name="content" rows="3"></textarea>
+        </div>
+
+        <div class="form-field">
+          <label for="note-chapter-input">Chapter (optional)</label>
+          <input type="text" id="note-chapter-input" name="chapter" autocomplete="off" />
+        </div>
+
+        <div class="form-field">
+          <label for="note-page-input">Page (optional)</label>
+          <input type="number" id="note-page-input" name="page" min="0" />
+        </div>
+
+        <div class="modal__actions">
+          <button type="button" id="note-modal-cancel-btn" class="btn btn--ghost">Cancel</button>
+          <button type="submit" class="btn btn--primary">Save Note</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="script.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./service-worker.js').catch(() => {});
+    }
+  </script>
+</body>
+</html>

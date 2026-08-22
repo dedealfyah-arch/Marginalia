@@ -1,0 +1,1572 @@
+/* =========================================================
+   MARGINALIA — Home v0.0.1 + Books v0.0.1 + Book Detail v0.0.1
+   Desain tenang untuk personal reading & knowledge app.
+   ========================================================= */
+
+/* -------- Design tokens -------- */
+:root {
+  /* Warna */
+  --bg: #faf9f5;
+  --surface: #ffffff;
+  --surface-alt: #f1efe9;
+  --border: #e6e3da;
+
+  --text-primary: #22261f;
+  --text-secondary: #6c6a61;
+  --text-muted: #9b988d;
+
+  --accent: #5b7b65;       /* sage green, terasa "reading & growth" */
+  --accent-dark: #46604f;
+  --accent-light: #e7eee8;
+
+  --status-want: #7a6a9c;
+  --status-want-bg: #eeebf5;
+  --status-reading: #5b7b65;
+  --status-reading-bg: #e7eee8;
+  --status-completed: #8a8f66;
+  --status-completed-bg: #f0f1e6;
+
+  --error: #a3403a;
+  --error-bg: #f8ecea;
+
+  /* Tipografi */
+  --font-display: Georgia, 'Iowan Old Style', 'Palatino Linotype', serif;
+  --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  /* Layout */
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 18px;
+  --sidebar-width: 240px;
+  --sidebar-width-tablet: 84px;
+
+  --shadow-sm: 0 1px 2px rgba(34, 38, 31, 0.04), 0 1px 1px rgba(34, 38, 31, 0.03);
+  --shadow-md: 0 6px 16px rgba(34, 38, 31, 0.06);
+}
+
+.persistence-error {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 20;
+  max-width: min(360px, calc(100vw - 32px));
+  margin: 0;
+  padding: 12px 14px;
+  color: var(--error);
+  background: var(--error-bg);
+  border: 1px solid var(--error);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+/* -------- Reset dasar -------- */
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+input,
+select,
+textarea {
+  font-family: inherit;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* Fokus keyboard yang jelas untuk aksesibilitas */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* =========================================================
+   LAYOUT UTAMA (Desktop): Sidebar | Main
+   ========================================================= */
+
+.app {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* -------- Sidebar -------- */
+.sidebar {
+  width: var(--sidebar-width);
+  flex-shrink: 0;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  padding: 28px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.sidebar__logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 8px;
+}
+
+.sidebar__logo-mark {
+  font-size: 22px;
+}
+
+.sidebar__logo-text {
+  font-family: var(--font-display);
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+
+.sidebar__nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.sidebar__footer {
+  border-top: 1px solid var(--border);
+  padding-top: 16px;
+}
+
+.sync-panel { margin: 0 8px 14px; }
+.sync-indicator { display: block; margin-bottom: 10px; color: var(--text-secondary); font-size: 12px; font-weight: 600; }
+.auth-form { display: grid; gap: 6px; }
+.auth-form input { width: 100%; padding: 8px 9px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 12px; }
+.auth-form .btn { width: 100%; padding: 8px 10px; font-size: 12px; }
+.auth-status { margin: 2px 0 0; color: var(--text-secondary); font-size: 11px; overflow-wrap: anywhere; }
+
+.reading-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.sidebar__link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-size: 14.5px;
+  font-weight: 500;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.sidebar__link:hover {
+  background: var(--surface-alt);
+  color: var(--text-primary);
+}
+
+.sidebar__link--active {
+  background: var(--accent-light);
+  color: var(--accent-dark);
+  font-weight: 600;
+}
+
+.sidebar__icon {
+  font-size: 16px;
+  width: 20px;
+  text-align: center;
+}
+
+/* -------- Main content -------- */
+.main {
+  flex: 1;
+  min-width: 0;
+  padding: 32px 40px 80px;
+}
+
+/* Setiap "view" (Home, Books, Book Detail, dst) mengisi ruang
+   yang sama. Hanya satu view yang terlihat pada satu waktu —
+   sisanya disembunyikan lewat atribut [hidden] oleh script.js. */
+.view {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.view[hidden] {
+  display: none !important;
+}
+
+/* -------- Header -------- */
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.header__title {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.header__subtitle {
+  margin: 4px 0 0;
+  color: var(--text-secondary);
+  font-size: 15px;
+}
+
+.header__profile {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  font-size: 17px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background-color 0.15s ease;
+}
+
+.header__profile:hover {
+  background: var(--surface-alt);
+}
+
+/* -------- Search -------- */
+.search {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search__icon {
+  position: absolute;
+  left: 18px;
+  font-size: 15px;
+  opacity: 0.55;
+}
+
+.search__input {
+  width: 100%;
+  padding: 15px 18px 15px 46px;
+  font-size: 15px;
+  font-family: inherit;
+  color: var(--text-primary);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.search__input::placeholder {
+  color: var(--text-muted);
+}
+
+.search__input:focus-visible {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-light);
+  outline: none;
+}
+
+/* -------- Global Search results -------- */
+.global-search-results {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.global-search-results .empty-message {
+  margin: 0;
+  padding: 12px 16px;
+  background: var(--surface-alt);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-md);
+}
+
+#view-home {
+  gap: 24px;
+}
+
+#view-home .search__input {
+  padding-top: 13px;
+  padding-bottom: 13px;
+}
+
+.home-primary-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: 20px;
+  align-items: start;
+}
+
+#view-home .section {
+  gap: 10px;
+  min-width: 0;
+}
+
+#view-home .reading-card {
+  min-height: 0;
+  padding: 18px;
+  gap: 16px;
+}
+
+#view-home .reading-card__cover {
+  width: 60px;
+  height: 84px;
+  font-size: 25px;
+}
+
+#view-home .reading-card__title {
+  font-size: 17px;
+}
+
+#view-home .reading-card__author {
+  margin-bottom: 4px;
+}
+
+#view-home .reading-card__body .btn {
+  padding: 9px 14px;
+  font-size: 13px;
+}
+
+#view-home .card-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+#view-home .item-card {
+  padding: 14px;
+  gap: 4px;
+}
+
+#view-home .item-card__title {
+  font-size: 14px;
+}
+
+#view-home .item-card__time {
+  margin-top: 4px;
+}
+
+#recently-added-grid .recent-item-card {
+  min-width: 0;
+  padding: 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: border-color 0.15s ease, transform 0.05s ease;
+}
+
+#recently-added-grid .recent-item-card:hover {
+  border-color: var(--accent);
+}
+
+#recently-added-grid .recent-item-card:active {
+  transform: scale(0.99);
+}
+
+#recently-added-grid .recent-item-card__type,
+#recently-added-grid .recent-item-card__title,
+#recently-added-grid .recent-item-card__source,
+#recently-added-grid .recent-item-card__date,
+#recently-added-grid .recent-item-card__page {
+  display: block;
+  min-width: 0;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+#recently-added-grid .recent-item-card__type {
+  color: var(--accent-dark);
+  font-size: 11px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+#recently-added-grid .recent-item-card__title {
+  font-family: var(--font-display);
+  font-size: 14px;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+#recently-added-grid .recent-item-card__source,
+#recently-added-grid .recent-item-card__date,
+#recently-added-grid .recent-item-card__page {
+  color: var(--text-secondary);
+  font-size: 12px;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  overflow: hidden;
+}
+
+#recently-added-grid .recent-item-card__page {
+  margin-top: 5px;
+  color: var(--text-muted);
+}
+
+#recently-added-grid .recent-item-card__date {
+  margin-top: 5px;
+  color: var(--text-muted);
+}
+
+#view-home .stat-grid {
+  gap: 10px;
+}
+
+#view-home .stat-card {
+  padding: 14px 16px;
+}
+
+#view-home .stat-card__number {
+  font-size: 23px;
+}
+
+.global-search-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.global-search-result {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) minmax(0, 1.5fr) auto;
+  align-items: center;
+  gap: 14px;
+  padding: 15px 18px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: border-color 0.15s ease, transform 0.05s ease;
+}
+
+.global-search-result:hover {
+  border-color: var(--accent);
+}
+
+.global-search-result:active {
+  transform: scale(0.995);
+}
+
+.global-search-result__type {
+  align-self: start;
+  padding: 4px 8px;
+  border-radius: 999px;
+  color: var(--accent-dark);
+  background: var(--accent-light);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+
+.global-search-result__title,
+.global-search-result__description,
+.global-search-result__source {
+  min-width: 0;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.global-search-result__title {
+  font-family: var(--font-display);
+  font-size: 15.5px;
+}
+
+.global-search-result__description,
+.global-search-result__source {
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+.global-search-result__source {
+  color: var(--text-muted);
+  text-align: right;
+  white-space: nowrap;
+}
+
+/* -------- Buttons (shared) -------- */
+.btn {
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 14.5px;
+  font-weight: 600;
+  padding: 12px 20px;
+  transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.05s ease;
+}
+
+.btn--primary {
+  background: var(--accent);
+  color: #ffffff;
+  white-space: nowrap;
+}
+
+.btn--primary:hover {
+  background: var(--accent-dark);
+}
+
+.btn--ghost {
+  background: transparent;
+  color: var(--accent-dark);
+  border: 1px solid var(--border);
+}
+
+.btn--ghost:hover {
+  background: var(--accent-light);
+  border-color: var(--accent);
+}
+
+.btn--danger {
+  background: transparent;
+  color: var(--error);
+  border: 1px solid var(--error-bg);
+}
+
+.btn--danger:hover {
+  background: var(--error-bg);
+  border-color: var(--error);
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+.add-knowledge {
+  display: flex;
+}
+
+/* Back button di Book Detail: jangan biarkan melebar penuh
+   walaupun berada langsung di dalam .view (flex column). */
+.back-btn {
+  align-self: flex-start;
+}
+
+/* -------- Section heading -------- */
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.section__title {
+  font-family: var(--font-display);
+  font-size: 19px;
+  font-weight: 700;
+  margin: 0;
+}
+
+/* Baris judul section + tombol aksi (dipakai di tab Book Detail) */
+.section-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.section-header-row .section__title {
+  margin: 0;
+}
+
+/* =========================================================
+   CONTINUE READING (Home) & BOOK HEADER (Book Detail)
+   Keduanya berbagi class .reading-card supaya tampilannya
+   konsisten.
+   ========================================================= */
+
+.reading-card {
+  display: flex;
+  gap: 24px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  box-shadow: var(--shadow-sm);
+}
+
+.reading-card__cover {
+  flex-shrink: 0;
+  width: 88px;
+  height: 120px;
+  border-radius: var(--radius-sm);
+  background: var(--accent-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 34px;
+}
+
+.reading-card__body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.reading-card__title {
+  font-family: var(--font-display);
+  font-size: 20px;
+  margin: 0;
+}
+
+.reading-card__author {
+  margin: 0 0 8px;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+/* Progress bar: track + fill diisi lebarnya lewat JavaScript */
+.progress {
+  width: 100%;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--surface-alt);
+  overflow: hidden;
+}
+
+.progress__bar {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 999px;
+  width: 0%; /* nilai awal, diperbarui oleh script.js */
+  transition: width 0.4s ease;
+}
+
+.reading-card__meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin: 6px 0 12px;
+}
+
+.reading-card__body .btn {
+  align-self: flex-start;
+}
+
+/* Badge status di header Book Detail butuh sedikit jarak */
+.book-detail-header .book-card__badge {
+  margin-bottom: 4px;
+}
+
+/* =========================================================
+   RECENTLY ADDED (Home)
+   ========================================================= */
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.compact-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
+  gap: 12px;
+}
+
+.compact-card {
+  min-width: 0;
+  min-height: 132px;
+  padding: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  overflow: hidden;
+  transition: border-color 0.15s ease, transform 0.05s ease;
+}
+
+.compact-card:hover {
+  border-color: var(--accent);
+}
+
+.compact-card:active {
+  transform: scale(0.99);
+}
+
+.compact-card__title,
+.compact-card__meta,
+.compact-card__description,
+.compact-card__page {
+  min-width: 0;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.compact-card__title {
+  font-family: var(--font-display);
+  font-size: 14.5px;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+.compact-card__meta,
+.compact-card__description {
+  color: var(--text-secondary);
+  font-size: 12px;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+.compact-card__page {
+  margin-top: 6px;
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
+.compact-card--quote .compact-card__title {
+  font-style: italic;
+}
+
+.aggregate-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.aggregate-toolbar__search {
+  flex: 1;
+  min-width: 0;
+}
+
+.aggregate-toolbar > .btn {
+  flex-shrink: 0;
+}
+
+.home-reading-section {
+  min-width: 0;
+}
+
+.item-card--clickable {
+  cursor: pointer;
+}
+
+.item-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  box-shadow: var(--shadow-sm);
+}
+
+.item-card__tag {
+  align-self: flex-start;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  padding: 3px 9px;
+  border-radius: 999px;
+  color: var(--accent-dark);
+  background: var(--accent-light);
+  margin-bottom: 4px;
+}
+
+.item-card__title {
+  font-family: var(--font-display);
+  font-size: 16px;
+  margin: 0;
+}
+
+.item-card__desc {
+  margin: 0;
+  font-size: 13.5px;
+  color: var(--text-secondary);
+}
+
+.item-card__time {
+  margin-top: 8px;
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+
+/* =========================================================
+   READING STATISTICS (Home)
+   ========================================================= */
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  box-shadow: var(--shadow-sm);
+}
+
+.stat-card__number {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--accent-dark);
+}
+
+.stat-card__label {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+/* =========================================================
+   BOOKS — toolbar (search + filter + add book)
+   ========================================================= */
+
+.books-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.books-toolbar__search {
+  flex: 1;
+  min-width: 220px;
+}
+
+.filter-select {
+  padding: 13px 16px;
+  font-size: 14.5px;
+  color: var(--text-primary);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+/* =========================================================
+   BOOKS — book grid & book card
+   ========================================================= */
+
+.book-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.book-card {
+  display: flex;
+  gap: 16px;
+  text-align: left;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 18px;
+  box-shadow: var(--shadow-sm);
+  transition: border-color 0.15s ease, transform 0.05s ease;
+}
+
+.book-card:hover {
+  border-color: var(--accent);
+}
+
+.book-card:active {
+  transform: scale(0.99);
+}
+
+.book-card__cover {
+  flex-shrink: 0;
+  width: 52px;
+  height: 72px;
+  border-radius: var(--radius-sm);
+  background: var(--accent-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+}
+
+.book-card__body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.book-card__title {
+  font-family: var(--font-display);
+  font-size: 15.5px;
+  margin: 0;
+  /* Cegah judul panjang merusak layout kartu */
+  overflow-wrap: anywhere;
+}
+
+.book-card__author {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.book-card__badge {
+  align-self: flex-start;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  padding: 3px 9px;
+  border-radius: 999px;
+  color: var(--status-want);
+  background: var(--status-want-bg);
+}
+
+.book-card__badge--want {
+  color: var(--status-want);
+  background: var(--status-want-bg);
+}
+
+.book-card__badge--reading {
+  color: var(--status-reading);
+  background: var(--status-reading-bg);
+}
+
+.book-card__badge--completed {
+  color: var(--status-completed);
+  background: var(--status-completed-bg);
+}
+
+.book-card__progress {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 2px;
+}
+
+.book-card__progress-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11.5px;
+  color: var(--text-secondary);
+}
+
+.empty-message {
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 14px;
+  padding: 24px;
+}
+
+/* =========================================================
+   BOOK DETAIL — tabs (Vocabulary / Quotes / Notes)
+   ========================================================= */
+
+.detail-tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid var(--border);
+}
+
+.detail-tab {
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.detail-tab:hover {
+  color: var(--text-primary);
+}
+
+.detail-tab--active {
+  color: var(--accent-dark);
+  border-bottom-color: var(--accent);
+}
+
+.detail-tab-panel[hidden] {
+  display: none !important;
+}
+
+/* =========================================================
+   BOOK DETAIL — vocabulary / quote / note cards
+   ========================================================= */
+
+.detail-card-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.detail-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  box-shadow: var(--shadow-sm);
+}
+
+/* Dipakai khusus untuk kartu Vocabulary, supaya terlihat
+   bisa diklik untuk membuka Vocabulary Detail. Quotes & Notes
+   tidak memakai class ini, jadi tampilannya tidak berubah. */
+.detail-card--clickable {
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  transition: border-color 0.15s ease, transform 0.05s ease;
+}
+
+.detail-card--clickable:hover {
+  border-color: var(--accent);
+}
+
+.detail-card--clickable:active {
+  transform: scale(0.99);
+}
+
+.detail-card--highlighted {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-light), var(--shadow-sm);
+  animation: detail-card-highlight 1.6s ease-out;
+}
+
+@keyframes detail-card-highlight {
+  0%, 100% {
+    background: var(--surface);
+  }
+
+  35% {
+    background: var(--accent-light);
+  }
+}
+
+.detail-card__title {
+  font-family: var(--font-display);
+  font-size: 16px;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.detail-card__meta {
+  margin: 0;
+  font-size: 13.5px;
+  color: var(--text-secondary);
+  overflow-wrap: anywhere;
+}
+
+.detail-card__quote {
+  margin: 0;
+  font-size: 14.5px;
+  font-style: italic;
+  color: var(--text-primary);
+  overflow-wrap: anywhere;
+}
+
+.detail-card__page {
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* Teks jumlah item di atas search (mis. "3 quotes") */
+.detail-list-count {
+  margin: -8px 0 0;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+/* Tombol Edit/Delete di dalam kartu (mis. Quote card).
+   Diberi border-top supaya terpisah dari isi kartu. */
+.detail-card__actions {
+  display: flex;
+  gap: 14px;
+  margin-top: 8px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+
+.card-action-btn {
+  background: transparent;
+  border: none;
+  padding: 0;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--accent-dark);
+}
+
+.card-action-btn:hover {
+  text-decoration: underline;
+}
+
+.card-action-btn--danger {
+  color: var(--error);
+}
+
+/* =========================================================
+   MODAL — Add Knowledge / Add Book / Update Progress / dst
+   (semua modal berbagi struktur overlay yang sama)
+   ========================================================= */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(34, 38, 31, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 100;
+}
+
+.modal-overlay[hidden] {
+  display: none;
+}
+
+.modal {
+  width: 100%;
+  max-width: 420px;
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  box-shadow: var(--shadow-md);
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal__title {
+  font-family: var(--font-display);
+  font-size: 20px;
+  margin: 0 0 18px;
+}
+
+.modal__options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.modal-option {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  text-align: left;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.modal-option:hover {
+  background: var(--accent-light);
+  border-color: var(--accent);
+}
+
+.modal-option__icon {
+  font-size: 20px;
+}
+
+.modal-option__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.modal-option__title {
+  font-weight: 600;
+  font-size: 14.5px;
+}
+
+.modal-option__desc {
+  font-size: 12.5px;
+  color: var(--text-secondary);
+}
+
+.modal__cancel {
+  width: 100%;
+  text-align: center;
+}
+
+/* -------- Form fields (Add Book / Update Progress / Add Vocabulary / dst) -------- */
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.form-field[hidden] {
+  display: none !important;
+}
+
+.form-field label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.form-field input,
+.form-field select,
+.form-field textarea {
+  padding: 11px 14px;
+  font-size: 14.5px;
+  color: var(--text-primary);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+
+.form-field textarea {
+  resize: vertical;
+  min-height: 72px;
+}
+
+.form-field input:focus-visible,
+.form-field select:focus-visible,
+.form-field textarea:focus-visible {
+  border-color: var(--accent);
+  outline: none;
+  box-shadow: 0 0 0 3px var(--accent-light);
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.form-error {
+  background: var(--error-bg);
+  color: var(--error);
+  font-size: 13px;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  margin: 0 0 16px;
+}
+
+.form-error[hidden] {
+  display: none;
+}
+
+.modal__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+/* Varian .modal__actions untuk modal detail: tombol Delete di
+   kiri, Close/Edit di kanan (dipakai oleh Vocabulary Detail) */
+.modal__actions--split {
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.modal__actions-right {
+  display: flex;
+  gap: 10px;
+}
+
+/* -------- Baris label/nilai di modal detail (read-only) -------- */
+
+.detail-view {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.detail-view__row {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0;
+}
+
+.detail-view__label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.detail-view__value {
+  font-size: 14.5px;
+  color: var(--text-primary);
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+/* =========================================================
+   BOTTOM NAV (Mobile)
+   ========================================================= */
+
+.bottom-nav {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  padding: 8px 6px calc(8px + env(safe-area-inset-bottom));
+  justify-content: space-between;
+  z-index: 50;
+}
+
+.bottom-nav__link {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  font-size: 10.5px;
+  color: var(--text-secondary);
+  padding: 4px 0;
+  border-radius: var(--radius-sm);
+}
+
+.bottom-nav__link span:first-child {
+  font-size: 17px;
+}
+
+.bottom-nav__link--active {
+  color: var(--accent-dark);
+  font-weight: 600;
+}
+
+/* =========================================================
+   RESPONSIVE: TABLET
+   ========================================================= */
+
+@media (max-width: 1024px) {
+  .sidebar {
+    width: var(--sidebar-width-tablet);
+    align-items: center;
+    padding: 24px 8px;
+  }
+
+  .sidebar__logo-text {
+    display: none;
+  }
+
+  .sidebar__label {
+    display: none;
+  }
+
+  .sidebar__link {
+    justify-content: center;
+    padding: 12px;
+  }
+
+  .main {
+    padding: 28px 24px 80px;
+  }
+
+  .card-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .stat-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .book-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .detail-card-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .compact-card-grid {
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  }
+}
+
+/* =========================================================
+   RESPONSIVE: MOBILE
+   ========================================================= */
+
+@media (max-width: 680px) {
+  .sidebar {
+    display: none;
+  }
+
+  .bottom-nav {
+    display: flex;
+  }
+
+  .main {
+    padding: 20px 16px 96px;
+  }
+
+  .view {
+    gap: 24px;
+  }
+
+  .header__title {
+    font-size: 23px;
+  }
+
+  .reading-card {
+    flex-direction: column;
+  }
+
+  .reading-card__cover {
+    width: 100%;
+    height: 100px;
+  }
+
+  .card-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .home-primary-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  #view-home .card-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  #recently-added-grid .recent-item-card {
+    padding: 12px;
+  }
+
+  .stat-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .book-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .detail-card-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .compact-card-grid {
+    grid-template-columns: repeat(auto-fit, minmax(105px, 1fr));
+    gap: 8px;
+  }
+
+  .compact-card {
+    min-height: 122px;
+    padding: 10px;
+  }
+
+  .compact-card__title {
+    font-size: 13.5px;
+  }
+
+  .compact-card__meta,
+  .compact-card__description {
+    font-size: 11.5px;
+  }
+
+  .books-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .aggregate-toolbar {
+    align-items: stretch;
+  }
+
+  .aggregate-toolbar > .btn {
+    width: 100%;
+  }
+
+  .books-toolbar__search {
+    min-width: 0;
+  }
+
+  .global-search-result {
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .global-search-result__description,
+  .global-search-result__source {
+    grid-column: 2;
+  }
+
+  .global-search-result__source {
+    text-align: left;
+    white-space: normal;
+  }
+
+  .detail-tabs {
+    overflow-x: auto;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .modal {
+    padding: 22px;
+  }
+}
+
+@media (max-width: 380px) {
+  .compact-card-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
