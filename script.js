@@ -789,7 +789,10 @@ async function refreshAuthUi() {
   authSubmitBtn.hidden = loggedIn;
   authLogoutBtn.hidden = !loggedIn;
   if (loggedIn) showAuthStatus(user.email || 'Signed in');
-  else authStatus.hidden = true;
+  else {
+    authStatus.hidden = true;
+    setSyncStatus('offline');
+  }
 }
 
 authForm.addEventListener('submit', async (event) => {

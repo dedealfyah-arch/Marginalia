@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#5b7b65" />
+  <link rel="icon" href="icons/marginalia.svg" type="image/svg+xml" />
   <link rel="manifest" href="manifest.json" />
   <title>Marginalia</title>
   <link rel="stylesheet" href="style.css" />
@@ -68,28 +69,34 @@
            ========================================================= -->
       <div class="view" id="view-home">
 
-        <!-- Search -->
-        <section class="search" aria-label="Pencarian">
-          <label for="search-input" class="visually-hidden">Cari koleksi Anda</label>
-          <span class="search__icon" aria-hidden="true">🔍</span>
-          <input
-            id="search-input"
-            type="text"
-            class="search__input"
-            placeholder="Search your knowledge..."
-            autocomplete="off"
-          />
-        </section>
+        <header class="home-header">
+          <div>
+            <p class="home-header__eyebrow">WELCOME</p>
+            <h1 class="home-header__title">Your reading space</h1>
+          </div>
+        </header>
+
+        <div class="home-tools">
+          <section class="search" aria-label="Pencarian">
+            <label for="search-input" class="visually-hidden">Cari koleksi Anda</label>
+            <span class="search__icon" aria-hidden="true">🔍</span>
+            <input
+              id="search-input"
+              type="text"
+              class="search__input"
+              placeholder="Search your knowledge..."
+              autocomplete="off"
+            />
+          </section>
+
+          <button type="button" id="add-knowledge-btn" class="btn btn--primary">+ Add Knowledge</button>
+        </div>
 
         <section class="global-search-results" aria-live="polite" aria-label="Hasil Global Search">
           <p id="global-search-empty" class="empty-message">Start typing to search your knowledge.</p>
           <p id="global-search-no-results" class="empty-message" hidden>No results found.</p>
           <div id="global-search-list" class="global-search-list"></div>
         </section>
-
-        <div class="add-knowledge">
-          <button type="button" id="add-knowledge-btn" class="btn btn--primary">+ Add Knowledge</button>
-        </div>
 
         <div class="home-primary-grid">
           <!-- Continue Reading -->
