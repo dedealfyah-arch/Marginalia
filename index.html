@@ -42,22 +42,10 @@
       </nav>
 
       <div class="sidebar__footer">
-        <div class="sync-panel" aria-live="polite">
-          <span id="sync-indicator" class="sync-indicator">⚠ Offline</span>
-          <form id="auth-form" class="auth-form" novalidate>
-            <label class="visually-hidden" for="auth-email-input">Email</label>
-            <input id="auth-email-input" type="email" placeholder="Email" autocomplete="email" />
-            <label class="visually-hidden" for="auth-password-input">Password</label>
-            <input id="auth-password-input" type="password" placeholder="Password" autocomplete="current-password" />
-            <button type="submit" id="auth-submit-btn" class="btn btn--primary">Login</button>
-            <button type="button" id="auth-logout-btn" class="btn btn--ghost" hidden>Logout</button>
-            <p id="auth-status" class="auth-status" hidden></p>
-          </form>
-        </div>
-        <a href="#" class="sidebar__link">
+        <button type="button" class="sidebar__link settings-trigger" aria-label="Open Settings">
           <span class="sidebar__icon" aria-hidden="true">⚙️</span>
           <span class="sidebar__label">Settings</span>
-        </a>
+        </button>
       </div>
     </aside>
 
@@ -112,7 +100,6 @@
 
             <div class="card-grid" id="recently-added-grid"></div>
             <p id="recently-added-empty" class="empty-message" hidden>No knowledge added yet.</p>
-            <button type="button" id="recently-added-empty-add-btn" class="btn btn--primary" hidden>Add Knowledge</button>
           </section>
         </div>
 
@@ -396,7 +383,36 @@
       <span aria-hidden="true">💬</span>
       <span>Quotes</span>
     </a>
+    <button type="button" class="bottom-nav__link settings-trigger" aria-label="Open Settings">
+      <span aria-hidden="true">⚙️</span>
+      <span>Settings</span>
+    </button>
   </nav>
+
+  <div class="modal-overlay" id="settings-modal-overlay" hidden>
+    <div class="modal settings-modal" role="dialog" aria-modal="true" aria-labelledby="settings-modal-title">
+      <div class="settings-modal__header">
+        <h2 id="settings-modal-title" class="modal__title">Settings</h2>
+        <button type="button" id="settings-close-btn" class="btn btn--ghost" aria-label="Close Settings">Close</button>
+      </div>
+      <section class="settings-section" aria-labelledby="account-title">
+        <h3 id="account-title">Account</h3>
+        <form id="auth-form" class="auth-form" novalidate>
+          <label class="visually-hidden" for="auth-email-input">Email</label>
+          <input id="auth-email-input" type="email" placeholder="Email" autocomplete="email" />
+          <label class="visually-hidden" for="auth-password-input">Password</label>
+          <input id="auth-password-input" type="password" placeholder="Password" autocomplete="current-password" />
+          <button type="submit" id="auth-submit-btn" class="btn btn--primary">Login</button>
+          <button type="button" id="auth-logout-btn" class="btn btn--ghost" hidden>Logout</button>
+          <p id="auth-status" class="auth-status" hidden></p>
+        </form>
+      </section>
+      <section class="settings-section" aria-labelledby="cloud-sync-title">
+        <h3 id="cloud-sync-title">Cloud Sync</h3>
+        <p id="sync-indicator" class="sync-indicator" aria-live="polite">⚠ Offline</p>
+      </section>
+    </div>
+  </div>
 
   <!-- ================= ADD KNOWLEDGE MODAL (Home) ================= -->
   <div class="modal-overlay" id="modal-overlay" hidden>

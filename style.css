@@ -163,12 +163,47 @@ textarea:focus-visible {
   padding-top: 16px;
 }
 
-.sync-panel { margin: 0 8px 14px; }
-.sync-indicator { display: block; margin-bottom: 10px; color: var(--text-secondary); font-size: 12px; font-weight: 600; }
+.sync-indicator { display: block; margin: 0; color: var(--text-secondary); font-size: 12px; font-weight: 600; }
 .auth-form { display: grid; gap: 6px; }
 .auth-form input { width: 100%; padding: 8px 9px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 12px; }
 .auth-form .btn { width: 100%; padding: 8px 10px; font-size: 12px; }
 .auth-status { margin: 2px 0 0; color: var(--text-secondary); font-size: 11px; overflow-wrap: anywhere; }
+
+.settings-trigger {
+  width: 100%;
+  border: 0;
+  text-align: left;
+}
+
+.settings-modal__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.settings-modal__header .modal__title {
+  margin-bottom: 0;
+}
+
+.settings-section + .settings-section {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+
+.settings-section h3 {
+  margin: 0 0 10px;
+  font-size: 14px;
+}
+
+.settings-section .auth-form {
+  grid-template-columns: 1fr;
+}
+
+.settings-section .auth-form .btn {
+  width: 100%;
+}
 
 .reading-card__actions {
   display: flex;
@@ -1467,13 +1502,6 @@ textarea:focus-visible {
     grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
   }
 
-  .sync-panel {
-    position: fixed;
-    left: calc(var(--sidebar-width-tablet) + 12px);
-    bottom: 16px;
-    width: 220px;
-    z-index: 61;
-  }
 }
 
 /* =========================================================
@@ -1482,64 +1510,7 @@ textarea:focus-visible {
 
 @media (max-width: 680px) {
   .sidebar {
-    display: flex;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    width: auto;
-    min-height: 0;
-    height: auto;
-    z-index: 60;
-    align-items: stretch;
-    padding: 10px 16px;
-    border-right: 0;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .sidebar__logo,
-  .sidebar__nav,
-  .sidebar__footer > .sidebar__link {
     display: none;
-  }
-
-  .sidebar__footer {
-    width: 100%;
-    border-top: 0;
-    padding-top: 0;
-  }
-
-  .sync-panel {
-    position: static;
-    width: auto;
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
-    align-items: start;
-    gap: 10px;
-    margin: 0;
-  }
-
-  .sync-indicator {
-    margin: 8px 0 0;
-    white-space: nowrap;
-  }
-
-  .auth-form {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
-    align-items: center;
-  }
-
-  .auth-form .btn {
-    width: auto;
-    min-height: 38px;
-  }
-
-  .auth-status {
-    grid-column: 1 / -1;
-  }
-
-  .main {
-    padding-top: 88px;
   }
 
   .bottom-nav {
@@ -1659,6 +1630,10 @@ textarea:focus-visible {
     padding: 22px;
   }
 
+  .settings-modal {
+    max-height: calc(100vh - 32px);
+  }
+
   .home-tools {
     align-items: stretch;
   }
@@ -1669,14 +1644,6 @@ textarea:focus-visible {
 }
 
 @media (max-width: 380px) {
-  .auth-form {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .auth-form .btn {
-    grid-column: 1 / -1;
-  }
-
   .compact-card-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }

@@ -55,6 +55,26 @@ function getMostRecentlyActiveReadingBook() {
 // Ambil semua link navigasi yang punya atribut data-view
 // (baik di sidebar desktop maupun bottom nav mobile)
 const navLinks = document.querySelectorAll('[data-view]');
+const settingsModalOverlay = document.getElementById('settings-modal-overlay');
+const settingsCloseBtn = document.getElementById('settings-close-btn');
+const settingsTriggers = document.querySelectorAll('.settings-trigger');
+
+function openSettings() {
+  settingsModalOverlay.hidden = false;
+  const firstInput = document.getElementById('auth-email-input');
+  if (!firstInput.hidden) firstInput.focus();
+  else settingsCloseBtn.focus();
+}
+
+function closeSettings() {
+  settingsModalOverlay.hidden = true;
+}
+
+settingsTriggers.forEach((trigger) => trigger.addEventListener('click', openSettings));
+settingsCloseBtn.addEventListener('click', closeSettings);
+settingsModalOverlay.addEventListener('click', (event) => {
+  if (event.target === settingsModalOverlay) closeSettings();
+});
 
 // showView menampilkan satu view berdasarkan id-nya, dan secara
 // terpisah menentukan link navigasi mana yang harus terlihat
@@ -308,7 +328,6 @@ updateHomeReadingProgress();
 const addKnowledgeBtn = document.getElementById('add-knowledge-btn');
 const modalOverlay = document.getElementById('modal-overlay');
 const modalCancelBtn = document.getElementById('modal-cancel-btn');
-const recentlyAddedEmptyAddBtn = document.getElementById('recently-added-empty-add-btn');
 const knowledgeOptions = document.getElementById('knowledge-options');
 const knowledgeEmptyState = document.getElementById('knowledge-empty-state');
 const knowledgeAddBookBtn = document.getElementById('knowledge-add-book-btn');
@@ -327,7 +346,6 @@ function closeModal() {
 
 if (addKnowledgeBtn) addKnowledgeBtn.addEventListener('click', openModal);
 if (modalCancelBtn) modalCancelBtn.addEventListener('click', closeModal);
-if (recentlyAddedEmptyAddBtn) recentlyAddedEmptyAddBtn.addEventListener('click', openModal);
 knowledgeAddBookBtn.addEventListener('click', () => {
   closeModal();
   openBookModal();
@@ -999,11 +1017,9 @@ function renderHomeState() {
 
   const recentGrid = document.getElementById('recently-added-grid');
   const recentlyAddedEmpty = document.getElementById('recently-added-empty');
-  const recentlyAddedEmptyAddBtn = document.getElementById('recently-added-empty-add-btn');
   const recentlyAddedItems = getRecentlyAddedItems();
   recentGrid.innerHTML = '';
   recentlyAddedEmpty.hidden = recentlyAddedItems.length !== 0;
-  recentlyAddedEmptyAddBtn.hidden = recentlyAddedItems.length !== 0;
 
   recentlyAddedItems.forEach((item) => {
     const card = document.createElement('article');
@@ -2842,4 +2858,5 @@ document.addEventListener('keydown', (event) => {
   if (!quoteDetailModalOverlay.hidden) closeQuoteDetailModal();
   if (!noteDetailModalOverlay.hidden) closeNoteDetailModal();
   if (!noteModalOverlay.hidden) closeNoteModal();
+  if (!settingsModalOverlay.hidden) closeSettings();
 });
